@@ -2,7 +2,9 @@ import { memo, useState } from "react";
 import { SidebarProps } from "../types/global";
 import { EditorMode } from "../types/global";
 import CustomSelect from "./CustomSelect";
+import { ColorPicker } from "./ColorPicker";
 import ImageUploader from "./ImageUploader";
+import SidebarSection from "./SidebarSection";
 
 const RangeControl = memo(
   ({
@@ -38,7 +40,7 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
   const [urlInput, setUrlInput] = useState("");
   return (
     <aside className="sidebar">
-      <h1>Controles</h1>
+      <h1>Ajustes</h1>
 
       <div className="control-group">
         <label>Modo</label>
@@ -56,7 +58,7 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
         <>
           <ImageUploader onImageUpload={actions.handleImageUpload} />
 
-          <div className="control-group" style={{ marginTop: "2rem" }}>
+          <div className="control-group" style={{ marginTop: "1rem" }}>
             <label>O importa desde URL</label>
             <div style={{ display: "flex", gap: "0.5rem" }}>
               <input
@@ -65,6 +67,11 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
                 className="input-field"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && urlInput) {
+                    actions.handleUrlImport(urlInput);
+                  }
+                }}
               />
               <button
                 className="action-button"
@@ -77,119 +84,257 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
           </div>
         </>
       ) : (
-        <div className="control-group">
-          <label>Texto</label>
-          <input
-            type="text"
-            className="input-field"
-            value={values.textContent}
-            onChange={(e) => actions.setTextContent(e.target.value)}
-          />
-        </div>
+        <>
+          <SidebarSection title="📝 Texto" defaultOpen={true}>
+            <div className="control-group">
+              <label>Contenido</label>
+              <input
+                type="text"
+                className="input-field"
+                value={values.textContent}
+                onChange={(e) => actions.setTextContent(e.target.value)}
+              />
+            </div>
+            <div className="controls-row">
+              <div className="control-group">
+                <label>Color</label>
+                <ColorPicker
+                  value={values.textColor}
+                  onChange={actions.setTextColor}
+                />
+              </div>
+              <div className="control-group">
+                <label>Estilo</label>
+                <CustomSelect
+                  value={values.textStyle}
+                  onChange={(value) => actions.setTextStyle(value as any)}
+                  options={[
+                    { value: "normal", label: "Normal" },
+                    { value: "glitch", label: "⚡ Glitch" },
+                    { value: "neon", label: "🔮 Neón" },
+                  ]}
+                />
+              </div>
+            </div>
+            <div className="controls-row">
+              <div className="control-group">
+                <label>Alineación</label>
+                <CustomSelect
+                  value={values.textAlign}
+                  onChange={(value) => actions.setTextAlign(value as any)}
+                  options={[
+                    { value: "left", label: "Izq" },
+                    { value: "center", label: "Cen" },
+                    { value: "right", label: "Der" },
+                  ]}
+                />
+              </div>
+              <RangeControl
+                label={`Tam: ${values.fontSize}px`}
+                value={values.fontSize}
+                min={12}
+                max={120}
+                onChange={actions.setFontSize}
+              />
+            </div>
+            <div className="control-group">
+              <label>Tipografía</label>
+              <CustomSelect
+                value={values.fontFamily}
+                onChange={(value) => actions.setFontFamily(value as any)}
+                options={[
+                  { value: "inter", label: "Inter" },
+                  { value: "serif", label: "Merriweather" },
+                  { value: "mono", label: "JetBrains Mono" },
+                  { value: "cursive", label: "Pacifico" },
+                  { value: "comic", label: "Bangers" },
+                  { value: "retro", label: "Press Start 2P" },
+                  { value: "display", label: "Abril Fatface" },
+                  { value: "scifi", label: "Space Mono" },
+                ]}
+              />
+            </div>
+          </SidebarSection>
+        </>
       )}
 
-      <div className="control-group">
-        <label>Color de fondo</label>
-        <div className="color-picker-wrapper">
-          <input
-            type="color"
-            className="color-input"
-            value={values.bgColor}
-            onChange={(e) => actions.setBgColor(e.target.value)}
-          />
-          <span className="color-value">{values.bgColor}</span>
-        </div>
-      </div>
+      {/* Secciones Colapsables */}
 
-      <div className="controls-row">
+      <SidebarSection title="✨ Filtros">
+        <div className="controls-row">
+          <RangeControl
+            label={`Brillo: ${values.filterBrightness}%`}
+            value={values.filterBrightness}
+            min={-100}
+            max={100}
+            onChange={actions.setFilterBrightness}
+          />
+          <RangeControl
+            label={`Contraste: ${values.filterContrast}%`}
+            value={values.filterContrast}
+            min={-100}
+            max={100}
+            onChange={actions.setFilterContrast}
+          />
+          <RangeControl
+            label={`Saturación: ${values.filterSaturation}%`}
+            value={values.filterSaturation}
+            min={-100}
+            max={100}
+            onChange={actions.setFilterSaturation}
+          />
+          <RangeControl
+            label={`Blur: ${values.filterBlur}px`}
+            value={values.filterBlur}
+            min={0}
+            max={20}
+            onChange={actions.setFilterBlur}
+          />
+          <RangeControl
+            label={`Opacidad: ${values.imageOpacity}%`}
+            value={values.imageOpacity}
+            min={0}
+            max={100}
+            onChange={actions.setImageOpacity}
+          />
+        </div>
+        <button
+          className="action-button-subtle"
+          onClick={actions.resetFilters}
+          style={{ width: "100%", marginTop: "12px", fontSize: "0.75rem" }}>
+          重 Restablecer Ajustes
+        </button>
+      </SidebarSection>
+
+      <SidebarSection title="⚡ Efectos FX">
+        <div className="control-group">
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: "pointer",
+            }}>
+            <input
+              type="checkbox"
+              checked={values.isNeonMode}
+              onChange={(e) => actions.setIsNeonMode(e.target.checked)}
+              style={{
+                width: "20px",
+                height: "20px",
+                accentColor: "var(--primary)",
+              }}
+            />
+            MODO NEÓN (Glow Intenso)
+          </label>
+        </div>
+        <div className="controls-row">
+          <RangeControl
+            label={`Ruido: ${values.effectNoise}%`}
+            value={values.effectNoise}
+            min={0}
+            max={100}
+            onChange={actions.setEffectNoise}
+          />
+          <RangeControl
+            label={`Reflejo: ${values.effectReflection}%`}
+            value={values.effectReflection}
+            min={0}
+            max={100}
+            onChange={actions.setEffectReflection}
+          />
+        </div>
+      </SidebarSection>
+
+      <SidebarSection title="🎨 Lienzo" defaultOpen={true}>
+        <div className="control-group">
+          <label>Color de fondo</label>
+          <ColorPicker value={values.bgColor} onChange={actions.setBgColor} />
+        </div>
         <RangeControl
           label={`Padding: ${values.padding}`}
           value={values.padding}
           onChange={actions.setPadding}
         />
+      </SidebarSection>
 
-        <RangeControl
-          label={`Opacidad: ${values.imageOpacity}%`}
-          value={values.imageOpacity}
-          min={0}
-          max={100}
-          onChange={actions.setImageOpacity}
-        />
-      </div>
-
-      <div className="controls-row">
+      <SidebarSection title="🖼️ Imagen">
+        {/* Opacidad movida a filtros */}
         <RangeControl
           label={`R-Img: ${values.borderRadius}`}
           value={values.borderRadius}
           onChange={actions.setBorderRadius}
         />
+        <div className="controls-row">
+          <RangeControl
+            label={`S-Img: ${values.imageShadow}px`}
+            value={values.imageShadow}
+            onChange={actions.setImageShadow}
+          />
+          <div className="control-group">
+            <label>Color</label>
+            <ColorPicker
+              value={values.imageShadowColor}
+              onChange={actions.setImageShadowColor}
+            />
+          </div>
+        </div>
+      </SidebarSection>
 
+      <SidebarSection title="🔲 Marco">
         <RangeControl
           label={`R-Fme: ${values.frameRadius}`}
           value={values.frameRadius}
           onChange={actions.setFrameRadius}
         />
-      </div>
-
-      <div className="controls-row">
-        <RangeControl
-          label={`S-Marco: ${values.frameShadow}px`}
-          value={values.frameShadow}
-          onChange={actions.setFrameShadow}
-        />
-
-        <RangeControl
-          label={`S-Img: ${values.imageShadow}px`}
-          value={values.imageShadow}
-          onChange={actions.setImageShadow}
-        />
-      </div>
-
-      <div className="controls-row">
-        <div className="control-group">
-          <label>C-Marco</label>
-          <div className="color-picker-wrapper">
-            <input
-              type="color"
-              className="color-input"
+        <div className="controls-row">
+          <RangeControl
+            label={`S-Marco: ${values.frameShadow}px`}
+            value={values.frameShadow}
+            onChange={actions.setFrameShadow}
+          />
+          <div className="control-group">
+            <label>Color</label>
+            <ColorPicker
               value={values.frameShadowColor}
-              onChange={(e) => actions.setFrameShadowColor(e.target.value)}
+              onChange={actions.setFrameShadowColor}
             />
           </div>
         </div>
+      </SidebarSection>
 
-        <div className="control-group">
-          <label>C-Img</label>
-          <div className="color-picker-wrapper">
-            <input
-              type="color"
-              className="color-input"
-              value={values.imageShadowColor}
-              onChange={(e) => actions.setImageShadowColor(e.target.value)}
-            />
-          </div>
+      <SidebarSection title="🧊 Transformación 3D">
+        <div className="controls-row">
+          <RangeControl
+            label={`Rot X: ${Math.round(values.rotateX)}°`}
+            value={values.rotateX}
+            min={-180}
+            max={180}
+            onChange={actions.setRotateX}
+          />
+
+          <RangeControl
+            label={`Rot Y: ${Math.round(values.rotateY)}°`}
+            value={values.rotateY}
+            min={-180}
+            max={180}
+            onChange={actions.setRotateY}
+          />
         </div>
-      </div>
-
-      <div className="controls-row">
         <RangeControl
-          label={`Rot X: ${values.rotateX}°`}
-          value={values.rotateX}
-          min={-180}
-          max={180}
-          onChange={actions.setRotateX}
+          label={`Zoom: ${Math.round(values.scale * 100)}%`}
+          value={values.scale}
+          min={0.5}
+          max={3}
+          step={0.1}
+          onChange={actions.setScale}
         />
+      </SidebarSection>
 
-        <RangeControl
-          label={`Rot Y: ${values.rotateY}°`}
-          value={values.rotateY}
-          min={-180}
-          max={180}
-          onChange={actions.setRotateY}
-        />
-      </div>
-
-      <button className="upload-btn" onClick={actions.handleExport}>
+      <button
+        className="upload-btn"
+        onClick={actions.handleExport}
+        style={{ marginTop: "auto" }}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"

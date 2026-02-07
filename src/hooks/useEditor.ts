@@ -1,14 +1,20 @@
-import { useReducer, useRef, useCallback } from "react";
-import { EditorMode, EditorState, EditorAction } from "../types/global";
-import { exportImage } from "../services/imageExporter";
+import { useCallback, useReducer, useRef } from "react";
 import { toast } from "sonner";
+import { exportImage } from "@/services/imageExporter";
+import { downscaleImage } from "@/utils/imageUtils";
+import {
+  EditorMode,
+  EditorState,
+  EditorAction,
+  fontFamily,
+} from "@/types/global";
 
 const initialState: EditorState = {
   imageUrl: null,
   bgColor: "#000000",
-  padding: 40,
-  borderRadius: 12,
-  frameRadius: 24,
+  padding: 0,
+  borderRadius: 0,
+  frameRadius: 0,
   frameShadow: 0,
   imageShadow: 0,
   frameShadowColor: "#000000",
@@ -19,6 +25,22 @@ const initialState: EditorState = {
   mode: "upload",
   textContent: "Escribe algo épico",
   isLoading: false,
+  fontFamily: "inter",
+  // Valores iniciales Filtros (Bipolares: 0 es el centro/original)
+  filterBrightness: 0,
+  filterContrast: 0,
+  filterSaturation: 0,
+  filterBlur: 0,
+  // Valores iniciales Efectos
+  effectNoise: 0,
+  effectReflection: 0,
+  isNeonMode: false,
+  // Valores iniciales Texto
+  textColor: "#ffffff",
+  fontSize: 24,
+  textAlign: "center",
+  textStyle: "normal",
+  scale: 1,
 };
 
 const editorReducer = (
@@ -56,6 +78,38 @@ const editorReducer = (
       return { ...state, textContent: action.payload };
     case "SET_LOADING":
       return { ...state, isLoading: action.payload };
+    case "SET_FONT_FAMILY":
+      return { ...state, fontFamily: action.payload };
+    case "SET_FILTER_BRIGHTNESS":
+      return { ...state, filterBrightness: action.payload };
+    case "SET_FILTER_CONTRAST":
+      return { ...state, filterContrast: action.payload };
+    case "SET_FILTER_SATURATION":
+      return { ...state, filterSaturation: action.payload };
+    case "SET_FILTER_BLUR":
+      return { ...state, filterBlur: action.payload };
+    case "SET_EFFECT_NOISE":
+      return { ...state, effectNoise: action.payload };
+    case "SET_EFFECT_REFLECTION":
+      return { ...state, effectReflection: action.payload };
+    case "SET_IS_NEON_MODE":
+      return { ...state, isNeonMode: action.payload };
+    case "SET_TEXT_COLOR":
+      return { ...state, textColor: action.payload };
+    case "SET_FONT_SIZE":
+      return { ...state, fontSize: action.payload };
+    case "SET_TEXT_ALIGN":
+      return { ...state, textAlign: action.payload };
+    case "SET_TEXT_STYLE":
+      return { ...state, textStyle: action.payload };
+    case "SET_SCALE":
+      return { ...state, scale: action.payload };
+    case "RESET_IMAGE_STATE":
+      return {
+        ...initialState,
+        imageUrl: state.imageUrl,
+        mode: state.mode, // Preservamos el modo actual (upload/canvas)
+      };
     default:
       return state;
   }
@@ -122,11 +176,89 @@ export const useEditor = () => {
     [],
   );
 
+  const handleExport = useCallback(() => {
+    exportImage(frameRef.current);
+  }, []);
+
+  const setFontFamily = useCallback(
+    (payload: fontFamily) => dispatch({ type: "SET_FONT_FAMILY", payload }),
+    [],
+  );
+
+  const setFilterBrightness = useCallback(
+    (payload: number) => dispatch({ type: "SET_FILTER_BRIGHTNESS", payload }),
+    [],
+  );
+  const setFilterContrast = useCallback(
+    (payload: number) => dispatch({ type: "SET_FILTER_CONTRAST", payload }),
+    [],
+  );
+  const setFilterSaturation = useCallback(
+    (payload: number) => dispatch({ type: "SET_FILTER_SATURATION", payload }),
+    [],
+  );
+  const setFilterBlur = useCallback(
+    (payload: number) => dispatch({ type: "SET_FILTER_BLUR", payload }),
+    [],
+  );
+  const setEffectNoise = useCallback(
+    (payload: number) => dispatch({ type: "SET_EFFECT_NOISE", payload }),
+    [],
+  );
+  const setEffectReflection = useCallback(
+    (payload: number) => dispatch({ type: "SET_EFFECT_REFLECTION", payload }),
+    [],
+  );
+  const setIsNeonMode = useCallback(
+    (payload: boolean) => dispatch({ type: "SET_IS_NEON_MODE", payload }),
+    [],
+  );
+  const setTextColor = useCallback(
+    (payload: string) => dispatch({ type: "SET_TEXT_COLOR", payload }),
+    [],
+  );
+  const setFontSize = useCallback(
+    (payload: number) => dispatch({ type: "SET_FONT_SIZE", payload }),
+    [],
+  );
+  const setTextAlign = useCallback(
+    (payload: "left" | "center" | "right") =>
+      dispatch({ type: "SET_TEXT_ALIGN", payload }),
+    [],
+  );
+  const setTextStyle = useCallback(
+    (payload: "normal" | "glitch" | "neon") =>
+      dispatch({ type: "SET_TEXT_STYLE", payload }),
+    [],
+  );
+  const setScale = useCallback(
+    (payload: number) => dispatch({ type: "SET_SCALE", payload }),
+    [],
+  );
+  const resetFilters = useCallback(
+    () => dispatch({ type: "RESET_IMAGE_STATE" }),
+    [],
+  );
+
   const handleImageUpload = useCallback(
-    (image: File) => {
+    async (image: File) => {
       if (image) {
-        setImageUrl(URL.createObjectURL(image));
-        toast.success("Imagen subida correctamente");
+        dispatch({ type: "SET_LOADING", payload: true });
+        try {
+          // Optimizar imagen si es muy grande (max 2048px)
+          const optimizedUrl = await downscaleImage(image);
+          // Reiniciar filtros y transformación al cargar nueva imagen
+          dispatch({ type: "RESET_IMAGE_STATE" });
+          setImageUrl(optimizedUrl);
+          toast.success("Imagen subida correctamente");
+        } catch (error) {
+          console.error("Error procesando imagen:", error);
+          toast.error("Error al procesar la imagen");
+          // Fallback a la original si falla algo
+          setImageUrl(URL.createObjectURL(image));
+        } finally {
+          dispatch({ type: "SET_LOADING", payload: false });
+        }
       }
     },
     [setImageUrl],
@@ -145,6 +277,8 @@ export const useEditor = () => {
         const data = await response.json();
 
         if (data.status === "success" && data.data.screenshot?.url) {
+          // Reiniciar filtros y transformación
+          dispatch({ type: "RESET_IMAGE_STATE" });
           setImageUrl(data.data.screenshot.url);
           toast.success("Captura importada correctamente");
           // dispatch({ type: "SET_MODE", payload: "canvas" }); // Eliminado para mantener la vista de imagen
@@ -160,10 +294,6 @@ export const useEditor = () => {
     },
     [setImageUrl],
   );
-
-  const handleExport = useCallback(() => {
-    exportImage(frameRef.current);
-  }, []);
 
   return {
     state,
@@ -186,6 +316,20 @@ export const useEditor = () => {
       handleImageUpload,
       handleUrlImport,
       handleExport,
+      setFontFamily,
+      setFilterBrightness,
+      setFilterContrast,
+      setFilterSaturation,
+      setFilterBlur,
+      setEffectNoise,
+      setEffectReflection,
+      setIsNeonMode,
+      setTextColor,
+      setFontSize,
+      setTextAlign,
+      setTextStyle,
+      setScale,
+      resetFilters,
     },
   };
 };

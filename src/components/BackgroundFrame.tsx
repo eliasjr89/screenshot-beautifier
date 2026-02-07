@@ -1,6 +1,5 @@
 import { memo } from "react";
 import { BackgroundFrameProps } from "../types/global";
-import { useDrag3D } from "../hooks/useDrag3D";
 
 const BackgroundFrame = memo(
   ({
@@ -16,46 +15,64 @@ const BackgroundFrame = memo(
     rotateY = 0,
     imageOpacity = 100,
     frameRef,
-    onRotateChange,
     children,
-  }: BackgroundFrameProps) => {
-    // Hook para arrastre 3D
-    const { isDragging, handlers } = useDrag3D((deltaRotateX, deltaRotateY) => {
-      if (onRotateChange) {
-        // Limitar rotación entre -180 y 180 grados
-        const clamp = (val: number) => {
-          while (val > 180) val -= 360;
-          while (val < -180) val += 360;
-          return val;
-        };
-        onRotateChange(
-          clamp(rotateX + deltaRotateX),
-          clamp(rotateY + deltaRotateY),
-        );
-      }
-    });
+    isNeonMode,
+    effectNoise,
+    effectReflection,
+    scale = 1,
+  }: BackgroundFrameProps & { isDragging?: boolean; scale?: number }) => {
+    const shadowColor = isNeonMode ? bgColor : frameShadowColor;
+    const finalFrameShadow = isNeonMode
+      ? `0 0 20px ${shadowColor}, 0 0 60px ${shadowColor}, 0 0 100px ${shadowColor}`
+      : `0 calc(${frameShadow}px * 1) calc(${frameShadow}px * 2) ${frameShadowColor}, 0 calc(${frameShadow}px * 0.6) calc(${frameShadow}px * 1.8) rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.1)`;
+
+    const reflectionShadow = isNeonMode
+      ? finalFrameShadow
+      : `0 calc(${frameShadow}px * -1) calc(${frameShadow}px * 2) ${frameShadowColor}, 0 calc(${frameShadow}px * -0.6) calc(${frameShadow}px * 1.8) rgba(0,0,0,0.6)`;
 
     return (
       <div
         ref={frameRef}
-        className={`background-frame ${isDragging ? "dragging" : ""}`}
-        {...handlers}
+        className={`background-frame ${isNeonMode ? "neon-mode" : ""}`}
         style={
           {
             "--frame-padding": `${padding}px`,
             "--frame-bg": bgColor,
             "--img-radius": `${borderRadius}px`,
             "--frame-radius": `${frameRadius}px`,
-            "--frame-shadow": frameShadow,
             "--image-shadow": imageShadow,
             "--frame-shadow-color": frameShadowColor,
             "--image-shadow-color": imageShadowColor,
             "--rotate-x": `${rotateX}deg`,
             "--rotate-y": `${rotateY}deg`,
-            "--image-opacity": imageOpacity / 100, // Convertir 0-100 a 0-1
+            "--scale": scale,
+            "--image-opacity": imageOpacity / 100,
+            boxShadow: finalFrameShadow,
           } as React.CSSProperties
         }>
-        {children}
+        <div className="frame-content">
+          {children}
+          {effectNoise !== undefined && effectNoise > 0 && (
+            <div
+              className="noise-overlay"
+              style={{ opacity: effectNoise / 100 }}
+            />
+          )}
+        </div>
+
+        {effectReflection !== undefined && effectReflection > 0 && (
+          <div
+            className="frame-reflection"
+            style={
+              {
+                "--reflection-opacity": effectReflection / 100,
+                boxShadow: reflectionShadow,
+              } as React.CSSProperties
+            }>
+            <div className="reflection-content">{children}</div>
+            <div className="reflection-gradient"></div>
+          </div>
+        )}
       </div>
     );
   },

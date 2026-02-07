@@ -17,6 +17,19 @@ export type SidebarProps = {
     imageOpacity: number;
     textContent: string;
     isLoading: boolean;
+    fontFamily: fontFamily;
+    filterBrightness: number;
+    filterContrast: number;
+    filterSaturation: number;
+    filterBlur: number;
+    effectNoise: number;
+    effectReflection: number;
+    isNeonMode: boolean;
+    textColor: string;
+    fontSize: number;
+    textAlign: "left" | "center" | "right";
+    textStyle: "normal" | "glitch" | "neon";
+    scale: number;
   };
   actions: {
     setBgColor: (color: string) => void;
@@ -35,8 +48,32 @@ export type SidebarProps = {
     handleImageUpload: (file: File) => void;
     handleUrlImport: (url: string) => Promise<void>;
     handleExport: () => void;
+    setFontFamily: (fontFamily: fontFamily) => void;
+    setFilterBrightness: (val: number) => void;
+    setFilterContrast: (val: number) => void;
+    setFilterSaturation: (val: number) => void;
+    setFilterBlur: (val: number) => void;
+    setEffectNoise: (val: number) => void;
+    setEffectReflection: (val: number) => void;
+    setIsNeonMode: (val: boolean) => void;
+    setTextColor: (val: string) => void;
+    setFontSize: (val: number) => void;
+    setTextAlign: (val: "left" | "center" | "right") => void;
+    setTextStyle: (val: "normal" | "glitch" | "neon") => void;
+    setScale: (val: number) => void;
+    resetFilters: () => void;
   };
   onImageUpload: (file: File) => void;
+};
+
+export type ImageUploaderProps = {
+  onImageUpload: (file: File) => void;
+};
+
+export type CanvasAreaProps = {
+  mode: EditorMode;
+  state: EditorState;
+  actions: EditorActions;
 };
 
 export type BackgroundFrameProps = {
@@ -54,9 +91,22 @@ export type BackgroundFrameProps = {
   frameRef?: React.RefObject<HTMLDivElement | null>;
   onRotateChange?: (rotateX: number, rotateY: number) => void;
   children: ReactNode;
+  // Efectos
+  effectNoise?: number;
+  effectReflection?: number;
+  isNeonMode?: boolean;
 };
 
 export type EditorMode = "upload" | "canvas";
+export type fontFamily =
+  | "inter"
+  | "serif"
+  | "mono"
+  | "cursive"
+  | "comic"
+  | "retro"
+  | "display"
+  | "scifi";
 
 export type EditorState = {
   imageUrl: string | null;
@@ -75,6 +125,23 @@ export type EditorState = {
   textContent: string;
   isLoading: boolean;
   frameRef?: React.RefObject<HTMLDivElement | null>;
+  fontFamily: fontFamily;
+  // Filtros
+  filterBrightness: number;
+  filterContrast: number;
+  filterSaturation: number;
+  filterBlur: number;
+  // Efectos Futuristas
+  effectNoise: number;
+  effectReflection: number;
+  isNeonMode: boolean;
+  // Texto Avanzado
+  textColor: string;
+  fontSize: number;
+  textAlign: "left" | "center" | "right";
+  textStyle: "normal" | "glitch" | "neon";
+  // Transform
+  scale: number;
 };
 
 export type EditorAction =
@@ -89,16 +156,24 @@ export type EditorAction =
   | { type: "SET_IMAGE_SHADOW_COLOR"; payload: string }
   | { type: "SET_ROTATE_X"; payload: number }
   | { type: "SET_ROTATE_Y"; payload: number }
+  | { type: "SET_SCALE"; payload: number }
+  | { type: "RESET_IMAGE_STATE" }
   | { type: "SET_IMAGE_OPACITY"; payload: number }
   | { type: "SET_MODE"; payload: EditorMode }
   | { type: "SET_TEXT_CONTENT"; payload: string }
-  | { type: "SET_LOADING"; payload: boolean };
-
-export type CanvasAreaProps = {
-  mode: EditorMode;
-  state: EditorState;
-  actions: EditorActions;
-};
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_FONT_FAMILY"; payload: fontFamily }
+  | { type: "SET_FILTER_BRIGHTNESS"; payload: number }
+  | { type: "SET_FILTER_CONTRAST"; payload: number }
+  | { type: "SET_FILTER_SATURATION"; payload: number }
+  | { type: "SET_FILTER_BLUR"; payload: number }
+  | { type: "SET_EFFECT_NOISE"; payload: number }
+  | { type: "SET_EFFECT_REFLECTION"; payload: number }
+  | { type: "SET_IS_NEON_MODE"; payload: boolean }
+  | { type: "SET_TEXT_COLOR"; payload: string }
+  | { type: "SET_FONT_SIZE"; payload: number }
+  | { type: "SET_TEXT_ALIGN"; payload: "left" | "center" | "right" }
+  | { type: "SET_TEXT_STYLE"; payload: "normal" | "glitch" | "neon" };
 
 export type EditorActions = {
   setImageUrl: (payload: string | null) => void;
@@ -117,4 +192,18 @@ export type EditorActions = {
   handleImageUpload: (file: File) => void;
   handleUrlImport: (url: string) => Promise<void>;
   handleExport: () => void;
+  setFontFamily: (payload: fontFamily) => void;
+  setFilterBrightness: (payload: number) => void;
+  setFilterContrast: (payload: number) => void;
+  setFilterSaturation: (payload: number) => void;
+  setFilterBlur: (payload: number) => void;
+  setEffectNoise: (payload: number) => void;
+  setEffectReflection: (payload: number) => void;
+  setIsNeonMode: (payload: boolean) => void;
+  setTextColor: (payload: string) => void;
+  setFontSize: (payload: number) => void;
+  setTextAlign: (payload: "left" | "center" | "right") => void;
+  setTextStyle: (payload: "normal" | "glitch" | "neon") => void;
+  setScale: (payload: number) => void;
+  resetFilters: () => void;
 };
