@@ -52,16 +52,6 @@ const BackgroundFrame = memo(
           {children}
         </div>
 
-        {effectNoise !== undefined && effectNoise > 0 && (
-          <div
-            className="noise-overlay"
-            style={{
-              opacity: effectNoise / 100,
-              borderRadius: "inherit", // Para que respete el radio del marco
-            }}
-          />
-        )}
-
         {effectReflection !== undefined && effectReflection > 0 && (
           <div
             className="frame-reflection"
@@ -74,6 +64,16 @@ const BackgroundFrame = memo(
             <div className="reflection-content">{children}</div>
             <div className="reflection-gradient"></div>
           </div>
+        )}
+
+        {effectNoise !== undefined && effectNoise > 0 && (
+          <div
+            className="noise-overlay"
+            style={{
+              opacity: effectNoise / 100,
+              borderRadius: "inherit", // Para que respete el radio del marco
+            }}
+          />
         )}
       </div>
     );

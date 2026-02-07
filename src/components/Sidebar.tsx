@@ -160,6 +160,62 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
 
       {/* Secciones Colapsables */}
 
+      <SidebarSection title="🎨 Lienzo" defaultOpen={true}>
+        <div className="control-row-group">
+          <div className="control-group">
+            <label>Color de fondo</label>
+            <ColorPicker value={values.bgColor} onChange={actions.setBgColor} />
+          </div>
+          <RangeControl
+            label={`Padding: ${values.padding}`}
+            value={values.padding}
+            onChange={actions.setPadding}
+          />
+        </div>
+
+        <div className="sub-section-title">Marco</div>
+        <RangeControl
+          label={`Radio Marco: ${values.frameRadius}`}
+          value={values.frameRadius}
+          onChange={actions.setFrameRadius}
+        />
+        <div className="controls-row">
+          <RangeControl
+            label={`Sombra: ${values.frameShadow}px`}
+            value={values.frameShadow}
+            onChange={actions.setFrameShadow}
+          />
+          <div className="control-group">
+            <label>Color</label>
+            <ColorPicker
+              value={values.frameShadowColor}
+              onChange={actions.setFrameShadowColor}
+            />
+          </div>
+        </div>
+
+        <div className="sub-section-title">Imagen</div>
+        <RangeControl
+          label={`Radio Imagen: ${values.borderRadius}`}
+          value={values.borderRadius}
+          onChange={actions.setBorderRadius}
+        />
+        <div className="controls-row">
+          <RangeControl
+            label={`Sombra: ${values.imageShadow}px`}
+            value={values.imageShadow}
+            onChange={actions.setImageShadow}
+          />
+          <div className="control-group">
+            <label>Color</label>
+            <ColorPicker
+              value={values.imageShadowColor}
+              onChange={actions.setImageShadowColor}
+            />
+          </div>
+        </div>
+      </SidebarSection>
+
       <SidebarSection title="✨ Filtros">
         <div className="controls-row">
           <RangeControl
@@ -243,37 +299,6 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
             max={100}
             onChange={actions.setEffectReflection}
           />
-        </div>
-      </SidebarSection>
-
-      <SidebarSection title="🎨 Lienzo" defaultOpen={true}>
-        <div className="control-group">
-          <label>Color de fondo</label>
-          <ColorPicker value={values.bgColor} onChange={actions.setBgColor} />
-        </div>
-        <RangeControl
-          label={`Padding: ${values.padding}`}
-          value={values.padding}
-          onChange={actions.setPadding}
-        />
-        <RangeControl
-          label={`R-Fme: ${values.frameRadius}`}
-          value={values.frameRadius}
-          onChange={actions.setFrameRadius}
-        />
-        <div className="controls-row">
-          <RangeControl
-            label={`S-Marco: ${values.frameShadow}px`}
-            value={values.frameShadow}
-            onChange={actions.setFrameShadow}
-          />
-          <div className="control-group">
-            <label>Color</label>
-            <ColorPicker
-              value={values.frameShadowColor}
-              onChange={actions.setFrameShadowColor}
-            />
-          </div>
         </div>
       </SidebarSection>
 
