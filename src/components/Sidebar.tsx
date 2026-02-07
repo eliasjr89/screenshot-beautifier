@@ -1,5 +1,7 @@
-import { memo } from "react";
-import { SidebarProps, EditorMode } from "../types/global";
+import { memo, useState } from "react";
+import { SidebarProps } from "../types/global";
+import { EditorMode } from "../types/global";
+import CustomSelect from "./CustomSelect";
 import ImageUploader from "./ImageUploader";
 
 const RangeControl = memo(
@@ -33,23 +35,47 @@ const RangeControl = memo(
 );
 
 const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
+  const [urlInput, setUrlInput] = useState("");
   return (
     <aside className="sidebar">
       <h1>Controles</h1>
 
       <div className="control-group">
         <label>Modo</label>
-        <select
+        <CustomSelect
           value={mode}
-          onChange={(e) => actions.setMode(e.target.value as EditorMode)}
-          className="input-field">
-          <option value="upload">Subir Imagen</option>
-          <option value="canvas">Modo Creativo</option>
-        </select>
+          onChange={(value) => actions.setMode(value as EditorMode)}
+          options={[
+            { value: "upload", label: "Subir Imagen" },
+            { value: "canvas", label: "Modo Creativo" },
+          ]}
+        />
       </div>
 
       {mode === "upload" ? (
-        <ImageUploader onImageUpload={actions.handleImageUpload} />
+        <>
+          <ImageUploader onImageUpload={actions.handleImageUpload} />
+
+          <div className="control-group" style={{ marginTop: "2rem" }}>
+            <label>O importa desde URL</label>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <input
+                type="url"
+                placeholder="https://microlink.io"
+                className="input-field"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+              />
+              <button
+                className="action-button"
+                disabled={values.isLoading || !urlInput}
+                onClick={() => actions.handleUrlImport(urlInput)}
+                style={{ width: "auto" }}>
+                {values.isLoading ? "..." : "Go"}
+              </button>
+            </div>
+          </div>
+        </>
       ) : (
         <div className="control-group">
           <label>Texto</label>
@@ -75,69 +101,109 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
         </div>
       </div>
 
-      <RangeControl
-        label={`Padding: ${values.padding}px`}
-        value={values.padding}
-        onChange={actions.setPadding}
-      />
+      <div className="controls-row">
+        <RangeControl
+          label={`Padding: ${values.padding}`}
+          value={values.padding}
+          onChange={actions.setPadding}
+        />
 
-      <RangeControl
-        label={`Radio (Imagen): ${values.borderRadius}px`}
-        value={values.borderRadius}
-        onChange={actions.setBorderRadius}
-      />
+        <RangeControl
+          label={`Opacidad: ${values.imageOpacity}%`}
+          value={values.imageOpacity}
+          min={0}
+          max={100}
+          onChange={actions.setImageOpacity}
+        />
+      </div>
 
-      <RangeControl
-        label={`Radio (Marco): ${values.frameRadius}px`}
-        value={values.frameRadius}
-        onChange={actions.setFrameRadius}
-      />
+      <div className="controls-row">
+        <RangeControl
+          label={`R-Img: ${values.borderRadius}`}
+          value={values.borderRadius}
+          onChange={actions.setBorderRadius}
+        />
 
-      <RangeControl
-        label={`Escala: ${values.scale.toFixed(1)}x`}
-        value={values.scale}
-        min={0.5}
-        max={2}
-        step={0.1}
-        onChange={actions.setScale}
-      />
+        <RangeControl
+          label={`R-Fme: ${values.frameRadius}`}
+          value={values.frameRadius}
+          onChange={actions.setFrameRadius}
+        />
+      </div>
 
-      <RangeControl
-        label={`Sombra: ${values.shadow}px`}
-        value={values.shadow}
-        onChange={actions.setShadow}
-      />
+      <div className="controls-row">
+        <RangeControl
+          label={`S-Marco: ${values.frameShadow}px`}
+          value={values.frameShadow}
+          onChange={actions.setFrameShadow}
+        />
 
-      <div className="control-group">
-        <label>Color de Sombra</label>
-        <div className="color-picker-wrapper">
-          <input
-            type="color"
-            className="color-input"
-            value={values.shadowColor} // Assuming hex for input color, might need conversion if rgba
-            onChange={(e) => actions.setShadowColor(e.target.value)}
-          />
-          <span className="color-value">{values.shadowColor}</span>
+        <RangeControl
+          label={`S-Img: ${values.imageShadow}px`}
+          value={values.imageShadow}
+          onChange={actions.setImageShadow}
+        />
+      </div>
+
+      <div className="controls-row">
+        <div className="control-group">
+          <label>C-Marco</label>
+          <div className="color-picker-wrapper">
+            <input
+              type="color"
+              className="color-input"
+              value={values.frameShadowColor}
+              onChange={(e) => actions.setFrameShadowColor(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="control-group">
+          <label>C-Img</label>
+          <div className="color-picker-wrapper">
+            <input
+              type="color"
+              className="color-input"
+              value={values.imageShadowColor}
+              onChange={(e) => actions.setImageShadowColor(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
-      <RangeControl
-        label={`Rotación X: ${values.rotateX}°`}
-        value={values.rotateX}
-        min={-45}
-        max={45}
-        onChange={actions.setRotateX}
-      />
+      <div className="controls-row">
+        <RangeControl
+          label={`Rot X: ${values.rotateX}°`}
+          value={values.rotateX}
+          min={-180}
+          max={180}
+          onChange={actions.setRotateX}
+        />
 
-      <RangeControl
-        label={`Rotación Y: ${values.rotateY}°`}
-        value={values.rotateY}
-        min={-45}
-        max={45}
-        onChange={actions.setRotateY}
-      />
+        <RangeControl
+          label={`Rot Y: ${values.rotateY}°`}
+          value={values.rotateY}
+          min={-180}
+          max={180}
+          onChange={actions.setRotateY}
+        />
+      </div>
 
       <button className="upload-btn" onClick={actions.handleExport}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ marginRight: "8px" }}>
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+          <circle cx="12" cy="13" r="4" />
+        </svg>
         Exportar PNG
       </button>
     </aside>

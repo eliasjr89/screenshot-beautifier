@@ -121,3 +121,4 @@ dist
 dist
 dist-ssr
 *.local
+.vercel

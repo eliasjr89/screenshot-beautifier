@@ -1,53 +1,24 @@
 import { useReducer, useRef, useCallback } from "react";
-import { EditorMode } from "../types/global";
+import { EditorMode, EditorState, EditorAction } from "../types/global";
 import { exportImage } from "../services/imageExporter";
 import { toast } from "sonner";
 
-type EditorState = {
-  imageUrl: string | null;
-  bgColor: string;
-  padding: number;
-  borderRadius: number;
-  frameRadius: number;
-  shadow: number;
-  shadowColor: string;
-  tilt: number;
-  rotateX: number;
-  rotateY: number;
-  scale: number;
-  mode: EditorMode;
-  textContent: string;
-};
-
-type EditorAction =
-  | { type: "SET_IMAGE"; payload: string | null }
-  | { type: "SET_BG_COLOR"; payload: string }
-  | { type: "SET_PADDING"; payload: number }
-  | { type: "SET_BORDER_RADIUS"; payload: number }
-  | { type: "SET_FRAME_RADIUS"; payload: number }
-  | { type: "SET_SHADOW"; payload: number }
-  | { type: "SET_SHADOW_COLOR"; payload: string }
-  | { type: "SET_TILT"; payload: number }
-  | { type: "SET_ROTATE_X"; payload: number }
-  | { type: "SET_ROTATE_Y"; payload: number }
-  | { type: "SET_SCALE"; payload: number }
-  | { type: "SET_MODE"; payload: EditorMode }
-  | { type: "SET_TEXT_CONTENT"; payload: string };
-
 const initialState: EditorState = {
   imageUrl: null,
-  bgColor: "#000000ff",
+  bgColor: "#000000",
   padding: 40,
   borderRadius: 12,
   frameRadius: 24,
-  shadow: 0,
-  shadowColor: "rgba(0,0,0,0.5)",
-  tilt: 0,
+  frameShadow: 0,
+  imageShadow: 0,
+  frameShadowColor: "#000000",
+  imageShadowColor: "#000000",
   rotateX: 0,
   rotateY: 0,
-  scale: 1,
+  imageOpacity: 100,
   mode: "upload",
   textContent: "Escribe algo épico",
+  isLoading: false,
 };
 
 const editorReducer = (
@@ -65,22 +36,26 @@ const editorReducer = (
       return { ...state, borderRadius: action.payload };
     case "SET_FRAME_RADIUS":
       return { ...state, frameRadius: action.payload };
-    case "SET_SHADOW":
-      return { ...state, shadow: action.payload };
-    case "SET_SHADOW_COLOR":
-      return { ...state, shadowColor: action.payload };
-    case "SET_TILT":
-      return { ...state, tilt: action.payload, rotateY: action.payload };
+    case "SET_FRAME_SHADOW":
+      return { ...state, frameShadow: action.payload };
+    case "SET_IMAGE_SHADOW":
+      return { ...state, imageShadow: action.payload };
+    case "SET_FRAME_SHADOW_COLOR":
+      return { ...state, frameShadowColor: action.payload };
+    case "SET_IMAGE_SHADOW_COLOR":
+      return { ...state, imageShadowColor: action.payload };
     case "SET_ROTATE_X":
       return { ...state, rotateX: action.payload };
     case "SET_ROTATE_Y":
-      return { ...state, rotateY: action.payload, tilt: action.payload };
-    case "SET_SCALE":
-      return { ...state, scale: action.payload };
+      return { ...state, rotateY: action.payload };
+    case "SET_IMAGE_OPACITY":
+      return { ...state, imageOpacity: action.payload };
     case "SET_MODE":
       return { ...state, mode: action.payload };
     case "SET_TEXT_CONTENT":
       return { ...state, textContent: action.payload };
+    case "SET_LOADING":
+      return { ...state, isLoading: action.payload };
     default:
       return state;
   }
@@ -110,16 +85,20 @@ export const useEditor = () => {
     (payload: number) => dispatch({ type: "SET_FRAME_RADIUS", payload }),
     [],
   );
-  const setShadow = useCallback(
-    (payload: number) => dispatch({ type: "SET_SHADOW", payload }),
+  const setFrameShadow = useCallback(
+    (payload: number) => dispatch({ type: "SET_FRAME_SHADOW", payload }),
     [],
   );
-  const setShadowColor = useCallback(
-    (payload: string) => dispatch({ type: "SET_SHADOW_COLOR", payload }),
+  const setImageShadow = useCallback(
+    (payload: number) => dispatch({ type: "SET_IMAGE_SHADOW", payload }),
     [],
   );
-  const setTilt = useCallback(
-    (payload: number) => dispatch({ type: "SET_TILT", payload }),
+  const setFrameShadowColor = useCallback(
+    (payload: string) => dispatch({ type: "SET_FRAME_SHADOW_COLOR", payload }),
+    [],
+  );
+  const setImageShadowColor = useCallback(
+    (payload: string) => dispatch({ type: "SET_IMAGE_SHADOW_COLOR", payload }),
     [],
   );
   const setRotateX = useCallback(
@@ -130,8 +109,8 @@ export const useEditor = () => {
     (payload: number) => dispatch({ type: "SET_ROTATE_Y", payload }),
     [],
   );
-  const setScale = useCallback(
-    (payload: number) => dispatch({ type: "SET_SCALE", payload }),
+  const setImageOpacity = useCallback(
+    (payload: number) => dispatch({ type: "SET_IMAGE_OPACITY", payload }),
     [],
   );
   const setMode = useCallback(
@@ -153,6 +132,35 @@ export const useEditor = () => {
     [setImageUrl],
   );
 
+  const handleUrlImport = useCallback(
+    async (url: string) => {
+      if (!url) return;
+
+      dispatch({ type: "SET_LOADING", payload: true });
+      try {
+        const encodedUrl = encodeURIComponent(url);
+        const response = await fetch(
+          `https://api.microlink.io/?url=${encodedUrl}&screenshot=true&meta=false&colorScheme=dark&viewport.width=1280&viewport.height=800`,
+        );
+        const data = await response.json();
+
+        if (data.status === "success" && data.data.screenshot?.url) {
+          setImageUrl(data.data.screenshot.url);
+          toast.success("Captura importada correctamente");
+          // dispatch({ type: "SET_MODE", payload: "canvas" }); // Eliminado para mantener la vista de imagen
+        } else {
+          toast.error("No se pudo capturar la imagen");
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Error al conectar con el servicio de captura");
+      } finally {
+        dispatch({ type: "SET_LOADING", payload: false });
+      }
+    },
+    [setImageUrl],
+  );
+
   const handleExport = useCallback(() => {
     exportImage(frameRef.current);
   }, []);
@@ -166,15 +174,17 @@ export const useEditor = () => {
       setPadding,
       setBorderRadius,
       setFrameRadius,
-      setShadow,
-      setShadowColor,
-      setTilt,
+      setFrameShadow,
+      setImageShadow,
+      setFrameShadowColor,
+      setImageShadowColor,
       setRotateX,
       setRotateY,
-      setScale,
+      setImageOpacity,
       setMode,
       setTextContent,
       handleImageUpload,
+      handleUrlImport,
       handleExport,
     },
   };

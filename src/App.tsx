@@ -8,9 +8,18 @@ const App = () => {
 
   return (
     <Layout>
-      <Sidebar mode={state.mode} values={state} actions={actions} />
+      <Sidebar
+        mode={state.mode}
+        values={state}
+        actions={actions}
+        onImageUpload={actions.handleImageUpload}
+      />
 
-      <CanvasArea mode={state.mode} state={{ ...state, frameRef }} />
+      <CanvasArea
+        mode={state.mode}
+        state={{ ...state, frameRef }}
+        actions={actions}
+      />
     </Layout>
   );
 };

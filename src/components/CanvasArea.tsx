@@ -1,26 +1,14 @@
 import { memo } from "react";
 import BackgroundFrame from "./BackgroundFrame";
-import { EditorMode } from "@/types/global";
+import { CanvasAreaProps } from "@/types/global";
 
-type CanvasAreaProps = {
-  mode: EditorMode;
-  state: {
-    imageUrl: string | null;
-    bgColor: string;
-    padding: number;
-    borderRadius: number;
-    frameRadius: number;
-    shadow: number;
-    shadowColor?: string;
-    rotateX?: number;
-    rotateY?: number;
-    scale?: number;
-    textContent: string;
-    frameRef: React.RefObject<HTMLDivElement | null>;
+const CanvasArea = memo(({ mode, state, actions }: CanvasAreaProps) => {
+  // Callback para actualizar rotación desde el arrastre 3D
+  const handleRotateChange = (newRotateX: number, newRotateY: number) => {
+    actions.setRotateX(newRotateX);
+    actions.setRotateY(newRotateY);
   };
-};
 
-const CanvasArea = memo(({ mode, state }: CanvasAreaProps) => {
   return (
     <main className="canvas">
       {mode === "upload" && !state.imageUrl ? (
@@ -31,17 +19,21 @@ const CanvasArea = memo(({ mode, state }: CanvasAreaProps) => {
           bgColor={state.bgColor}
           borderRadius={state.borderRadius}
           frameRadius={state.frameRadius}
-          shadow={state.shadow}
-          shadowColor={state.shadowColor}
+          frameShadow={state.frameShadow}
+          imageShadow={state.imageShadow}
+          frameShadowColor={state.frameShadowColor}
+          imageShadowColor={state.imageShadowColor}
           rotateX={state.rotateX}
           rotateY={state.rotateY}
-          scale={state.scale}
-          frameRef={state.frameRef}>
+          imageOpacity={state.imageOpacity}
+          frameRef={state.frameRef}
+          onRotateChange={handleRotateChange}>
           {mode === "upload" && state.imageUrl && (
             <img
               src={state.imageUrl}
               alt="Uploaded"
               className="preview-image"
+              crossOrigin="anonymous"
             />
           )}
 
