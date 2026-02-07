@@ -979,8 +979,8 @@ input[type="range"]::-moz-range-thumb:hover {
     border-radius: var(--frame-radius, 24px);
     background: var(--frame-bg);
     padding: var(--frame-padding);
-    /* Copiar sombras para realismo */
-    box-shadow: inherit;
+    /* Eliminamos box-shadow para que no se vea el borde de la caja del reflejo */
+    box-shadow: none;
     opacity: 0.7;
     /* Ligeramente más tenue para que la sombra no sature */
 }

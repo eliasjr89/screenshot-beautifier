@@ -251,11 +251,6 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
           <label>Color de fondo</label>
           <ColorPicker value={values.bgColor} onChange={actions.setBgColor} />
         </div>
-        <RangeControl
-          label={`Padding: ${values.padding}`}
-          value={values.padding}
-          onChange={actions.setPadding}
-        />
       </SidebarSection>
 
       <SidebarSection title="🖼️ Imagen">
@@ -282,6 +277,11 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
       </SidebarSection>
 
       <SidebarSection title="🔲 Marco">
+        <RangeControl
+          label={`Padding: ${values.padding}`}
+          value={values.padding}
+          onChange={actions.setPadding}
+        />
         <RangeControl
           label={`R-Fme: ${values.frameRadius}`}
           value={values.frameRadius}

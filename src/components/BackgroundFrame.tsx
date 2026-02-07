@@ -26,9 +26,7 @@ const BackgroundFrame = memo(
       ? `0 0 20px ${shadowColor}, 0 0 60px ${shadowColor}, 0 0 100px ${shadowColor}`
       : `0 calc(${frameShadow}px * 1) calc(${frameShadow}px * 2) ${frameShadowColor}, 0 calc(${frameShadow}px * 0.6) calc(${frameShadow}px * 1.8) rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.1)`;
 
-    const reflectionShadow = isNeonMode
-      ? finalFrameShadow
-      : `0 calc(${frameShadow}px * -1) calc(${frameShadow}px * 2) ${frameShadowColor}, 0 calc(${frameShadow}px * -0.6) calc(${frameShadow}px * 1.8) rgba(0,0,0,0.6)`;
+    const reflectionShadow = "none"; // Eliminamos sombra para evitar efecto de caja dura en el reflejo
 
     return (
       <div
@@ -50,15 +48,19 @@ const BackgroundFrame = memo(
             boxShadow: finalFrameShadow,
           } as React.CSSProperties
         }>
-        <div className="frame-content">
+        <div className="frame-content" style={{ padding: padding + "px" }}>
           {children}
-          {effectNoise !== undefined && effectNoise > 0 && (
-            <div
-              className="noise-overlay"
-              style={{ opacity: effectNoise / 100 }}
-            />
-          )}
         </div>
+
+        {effectNoise !== undefined && effectNoise > 0 && (
+          <div
+            className="noise-overlay"
+            style={{
+              opacity: effectNoise / 100,
+              borderRadius: "inherit", // Para que respete el radio del marco
+            }}
+          />
+        )}
 
         {effectReflection !== undefined && effectReflection > 0 && (
           <div
