@@ -160,7 +160,7 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
 
       {/* Secciones Colapsables */}
 
-      <SidebarSection title="🎨 Lienzo" defaultOpen={true}>
+      <SidebarSection title="🎨 Lienzo" defaultOpen={false}>
         <div className="control-row-group">
           <div className="control-group">
             <label>Color de fondo</label>
@@ -216,7 +216,7 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
         </div>
       </SidebarSection>
 
-      <SidebarSection title="✨ Filtros">
+      <SidebarSection title="✨ Filtros" defaultOpen={false}>
         <div className="controls-row">
           <RangeControl
             label={`Brillo: ${values.filterBrightness}%`}
@@ -262,7 +262,7 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
         </button>
       </SidebarSection>
 
-      <SidebarSection title="⚡ Efectos FX">
+      <SidebarSection title="⚡ Efectos FX" defaultOpen={false}>
         <div className="control-group">
           <label
             style={{
@@ -302,7 +302,7 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
         </div>
       </SidebarSection>
 
-      <SidebarSection title="🧊 Transformación 3D">
+      <SidebarSection title="🧊 Transformación 3D" defaultOpen={false}>
         <div className="controls-row">
           <RangeControl
             label={`Rot X: ${Math.round(values.rotateX)}°`}
