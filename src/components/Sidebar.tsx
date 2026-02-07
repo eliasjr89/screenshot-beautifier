@@ -251,32 +251,6 @@ const Sidebar = memo(({ mode, values, actions }: SidebarProps) => {
           <label>Color de fondo</label>
           <ColorPicker value={values.bgColor} onChange={actions.setBgColor} />
         </div>
-      </SidebarSection>
-
-      <SidebarSection title="🖼️ Imagen">
-        {/* Opacidad movida a filtros */}
-        <RangeControl
-          label={`R-Img: ${values.borderRadius}`}
-          value={values.borderRadius}
-          onChange={actions.setBorderRadius}
-        />
-        <div className="controls-row">
-          <RangeControl
-            label={`S-Img: ${values.imageShadow}px`}
-            value={values.imageShadow}
-            onChange={actions.setImageShadow}
-          />
-          <div className="control-group">
-            <label>Color</label>
-            <ColorPicker
-              value={values.imageShadowColor}
-              onChange={actions.setImageShadowColor}
-            />
-          </div>
-        </div>
-      </SidebarSection>
-
-      <SidebarSection title="🔲 Marco">
         <RangeControl
           label={`Padding: ${values.padding}`}
           value={values.padding}
