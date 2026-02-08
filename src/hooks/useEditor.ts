@@ -41,6 +41,8 @@ const initialState: EditorState = {
   textAlign: "center",
   textStyle: "normal",
   scale: 1,
+  translateX: 0,
+  translateY: 0,
 };
 
 const editorReducer = (
@@ -104,6 +106,10 @@ const editorReducer = (
       return { ...state, textStyle: action.payload };
     case "SET_SCALE":
       return { ...state, scale: action.payload };
+    case "SET_TRANSLATE_X":
+      return { ...state, translateX: action.payload };
+    case "SET_TRANSLATE_Y":
+      return { ...state, translateY: action.payload };
     case "RESET_IMAGE_STATE":
       return {
         ...initialState,
@@ -233,6 +239,14 @@ export const useEditor = () => {
   );
   const setScale = useCallback(
     (payload: number) => dispatch({ type: "SET_SCALE", payload }),
+    [],
+  );
+  const setTranslateX = useCallback(
+    (payload: number) => dispatch({ type: "SET_TRANSLATE_X", payload }),
+    [],
+  );
+  const setTranslateY = useCallback(
+    (payload: number) => dispatch({ type: "SET_TRANSLATE_Y", payload }),
     [],
   );
   const resetFilters = useCallback(

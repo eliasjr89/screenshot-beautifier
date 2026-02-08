@@ -740,6 +740,14 @@ input[type="range"]::-moz-range-thumb:hover {
     font-weight: 300;
 }
 
+.canvas.dragging {
+    cursor: grabbing !important;
+}
+
+.canvas.panning {
+    cursor: move !important;
+}
+
 /* Preview Component */
 .background-frame {
     display: inline-block;
@@ -764,8 +772,7 @@ input[type="range"]::-moz-range-thumb:hover {
     /* Glass border effect */
 
     transform-style: preserve-3d;
-    transform:
-        perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) scale(var(--scale, 1));
+    transform: perspective(1000px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) scale(var(--scale, 1)) translate(var(--translate-x, 0px), var(--translate-y, 0px));
 
     transition: transform 0.1s ease-out, box-shadow 0.3s ease-out;
     transition: transform 0.1s ease-out, box-shadow 0.3s ease-out;

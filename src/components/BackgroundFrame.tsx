@@ -20,7 +20,14 @@ const BackgroundFrame = memo(
     effectNoise,
     effectReflection,
     scale = 1,
-  }: BackgroundFrameProps & { isDragging?: boolean; scale?: number }) => {
+    translateX = 0,
+    translateY = 0,
+  }: BackgroundFrameProps & {
+    isDragging?: boolean;
+    scale?: number;
+    translateX?: number;
+    translateY?: number;
+  }) => {
     const shadowColor = isNeonMode ? bgColor : frameShadowColor;
     const finalFrameShadow = isNeonMode
       ? `0 0 20px ${shadowColor}, 0 0 60px ${shadowColor}, 0 0 100px ${shadowColor}`
@@ -44,6 +51,8 @@ const BackgroundFrame = memo(
             "--rotate-x": `${rotateX}deg`,
             "--rotate-y": `${rotateY}deg`,
             "--scale": scale,
+            "--translate-x": `${translateX}px`,
+            "--translate-y": `${translateY}px`,
             "--image-opacity": imageOpacity / 100,
             boxShadow: finalFrameShadow,
           } as React.CSSProperties

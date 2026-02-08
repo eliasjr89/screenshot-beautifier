@@ -16,18 +16,21 @@ const CanvasArea = memo(({ mode, state, actions }: CanvasAreaProps) => {
   };
 
   const handleScaleChange = (delta: number) => {
-    const newScale = Math.min(Math.max(state.scale + delta, 0.5), 3); // Límite 0.5x a 3x
+    const newScale = Math.min(Math.max(state.scale + delta, 0.1), 3); // Límite 0.1x a 3x
     actions.setScale(newScale);
   };
 
-  const { isDragging, handleMouseDown, handleTouchStart } = useDrag3D(
-    handleRotateChange,
-    handleScaleChange,
-  );
+  const handlePanChange = (deltaX: number, deltaY: number) => {
+    actions.setTranslateX(state.translateX + deltaX);
+    actions.setTranslateY(state.translateY + deltaY);
+  };
+
+  const { isDragging, isPanning, handleMouseDown, handleTouchStart } =
+    useDrag3D(handleRotateChange, handleScaleChange, handlePanChange);
 
   return (
     <main
-      className={`canvas ${isDragging ? "dragging" : ""}`}
+      className={`canvas ${isDragging ? "dragging" : ""} ${isPanning ? "panning" : ""}`}
       onMouseDown={
         mode === "canvas" || (mode === "upload" && state.imageUrl)
           ? handleMouseDown
@@ -39,11 +42,13 @@ const CanvasArea = memo(({ mode, state, actions }: CanvasAreaProps) => {
           : undefined
       }
       style={{
-        cursor: isDragging
-          ? "grabbing"
-          : mode === "canvas" || (mode === "upload" && state.imageUrl)
-            ? "grab"
-            : "default",
+        cursor: isPanning
+          ? "move"
+          : isDragging
+            ? "grabbing"
+            : mode === "canvas" || (mode === "upload" && state.imageUrl)
+              ? "grab"
+              : "default",
       }}>
       {mode === "upload" && !state.imageUrl ? (
         <h1 className="placeholder-text">Sube una imagen para empezar</h1>
@@ -64,7 +69,9 @@ const CanvasArea = memo(({ mode, state, actions }: CanvasAreaProps) => {
           isNeonMode={state.isNeonMode}
           effectNoise={state.effectNoise}
           effectReflection={state.effectReflection}
-          scale={state.scale}>
+          scale={state.scale}
+          translateX={state.translateX}
+          translateY={state.translateY}>
           {mode === "upload" && state.imageUrl && (
             <img
               src={state.imageUrl}

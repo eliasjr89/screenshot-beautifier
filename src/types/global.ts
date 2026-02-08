@@ -142,6 +142,8 @@ export type EditorState = {
   textStyle: "normal" | "glitch" | "neon";
   // Transform
   scale: number;
+  translateX: number;
+  translateY: number;
 };
 
 export type EditorAction =
@@ -173,7 +175,9 @@ export type EditorAction =
   | { type: "SET_TEXT_COLOR"; payload: string }
   | { type: "SET_FONT_SIZE"; payload: number }
   | { type: "SET_TEXT_ALIGN"; payload: "left" | "center" | "right" }
-  | { type: "SET_TEXT_STYLE"; payload: "normal" | "glitch" | "neon" };
+  | { type: "SET_TEXT_STYLE"; payload: "normal" | "glitch" | "neon" }
+  | { type: "SET_TRANSLATE_X"; payload: number }
+  | { type: "SET_TRANSLATE_Y"; payload: number };
 
 export type EditorActions = {
   setImageUrl: (payload: string | null) => void;
@@ -205,5 +209,7 @@ export type EditorActions = {
   setTextAlign: (payload: "left" | "center" | "right") => void;
   setTextStyle: (payload: "normal" | "glitch" | "neon") => void;
   setScale: (payload: number) => void;
+  setTranslateX: (payload: number) => void;
+  setTranslateY: (payload: number) => void;
   resetFilters: () => void;
 };
