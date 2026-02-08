@@ -57,8 +57,12 @@ export const useDrag3D = (
 
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
-      // Importante: Prevenir scroll mientras se rota/zoomea
-      if (e.cancelable) {
+      // Solo prevenir scroll si estamos activamente arrastrando o haciendo zoom
+      // Esto permite que la sidebar y otros elementos tengan scroll normal
+      const isActivelyInteracting =
+        isDragging || (e.touches.length === 2 && lastDistance.current !== null);
+
+      if (isActivelyInteracting && e.cancelable) {
         e.preventDefault();
       }
 
