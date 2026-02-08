@@ -72,10 +72,14 @@
 html,
 body {
     margin: 0;
-    height: 100vh;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: var(--bg-app);
     color: var(--text-primary);
-    background-color: var(--bg-app);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: pan-y pan-x;
+    /* Permitir scroll táctil en todas las direcciones */
 }
 
 /* Custom Scrollbar Global */
@@ -346,7 +350,11 @@ select.input-field:focus {
         flex-direction: column-reverse;
         /* Sidebar abajo */
         height: 100vh;
-        overflow: hidden;
+        overflow-y: auto;
+        /* Permitir scroll vertical en móvil */
+        overflow-x: hidden;
+        touch-action: pan-y;
+        /* Habilitar gestos táctiles verticales */
     }
 
     .sidebar {
@@ -359,8 +367,9 @@ select.input-field:focus {
         padding: 24px;
         overflow-y: auto;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
         z-index: 100;
+        touch-action: pan-y;
+        /* Permitir scroll táctil en sidebar */
     }
 
     /* En modo "panel inferior", aprovechamos el ancho para mostrar más controles */
@@ -372,6 +381,9 @@ select.input-field:focus {
         flex: 1;
         min-height: 50vh;
         padding: 40px 20px;
+        overflow-y: auto;
+        /* Permitir scroll en el canvas también */
+        touch-action: pan-y;
     }
 
     .background-frame {
