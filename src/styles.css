@@ -133,6 +133,10 @@ body {
     overflow-x: hidden;
     /* Evita scroll horizontal */
     height: 100%;
+    -webkit-overflow-scrolling: touch;
+    /* Scroll suave en iOS */
+    touch-action: pan-y;
+    /* Permitir gestos táctiles verticales */
 }
 
 /* Sidebar Sections (Accordion) */
@@ -391,6 +395,22 @@ select.input-field:focus {
         width: auto;
         max-width: 100%;
         /* transform: none !important; ELIMINADO para permitir 3D */
+    }
+}
+
+/* Móvil Horizontal (Landscape) - Simula vista escritorio pero con touch */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .sidebar {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+        max-height: 100vh;
+        /* Asegurar que no se desborde */
+    }
+
+    .layout-container {
+        touch-action: pan-y pan-x;
+        /* Permitir scroll en ambas direcciones si es necesario */
     }
 }
 
